@@ -18,7 +18,7 @@ describe('Sign In page', () => {
   const loginButtonSelector = 'button[type="submit"]';
 
   beforeEach(() => {
-    cy.visit('/');
+    cy.visit('https://conduit.mate.academy/');
   });
 
   it('should allow a user to log in with valid credentials', () => {
