@@ -14,9 +14,18 @@ describe('Sign In page', () => {
   };
 
   const generateUser = () => {
-    const username = faker.internet.userName().toLowerCase();
+    const username = faker.string.alpha({
+      length: { min: 3, max: 12 },
+      casing: 'lower'
+    });
+
     const email = faker.internet.email({ firstName: username }).toLowerCase();
-    const password = faker.internet.password({ length: 12, memorable: true, pattern: /[A-Z]/, prefix: '1!' });
+    const password = faker.internet.password({
+      length: 12,
+      memorable: true,
+      pattern: /[A-Z]/,
+      prefix: '1!'
+    });
 
     return {
       username,
