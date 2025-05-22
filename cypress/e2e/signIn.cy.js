@@ -1,43 +1,46 @@
 /// <reference types="cypress" />
 
+import { faker } from '@faker-js/faker';
+
 describe('Sign In page', () => {
-  const randomNumber = Math.random().toString().slice(2, 8);
+  const BASE_URL = 'https://conduit.mate.academy';
+  const API_URL = `${BASE_URL}/api/users`;
 
-  const baseUsername = 'SomeUser';
-  const username = `${baseUsername}${randomNumber}`.toLowerCase();
+  const SELECTORS = {
+    loginLink: 'a[href="/user/login"]',
+    emailInput: 'input[placeholder="Email"]',
+    passwordInput: 'input[placeholder="Password"]',
+    loginButton: 'button[type="submit"]'
+  };
 
-  const emailDomain = '@mail.com';
-  const email = `${username}${emailDomain}`.toLowerCase();
+  const generateUser = () => {
+    const username = faker.internet.userName().toLowerCase();
+    const email = faker.internet.email({ firstName: username }).toLowerCase();
+    const password = faker.internet.password({ length: 12, memorable: true, pattern: /[A-Z]/, prefix: '1!' });
 
-  const password = 'RandomPassword123!';
-
-  const apiUrl = 'https://conduit.mate.academy/api/users';
-  const loginLinkSelector = 'a[href="/user/login"]';
-  const emailInputSelector = 'input[placeholder="Email"]';
-  const passwordInputSelector = 'input[placeholder="Password"]';
-  const loginButtonSelector = 'button[type="submit"]';
+    return {
+      username,
+      email,
+      password,
+      payload: {
+        user: { username, email, password }
+      }
+    };
+  };
 
   beforeEach(() => {
-    cy.visit('https://conduit.mate.academy/');
+    cy.visit(BASE_URL);
   });
 
   it('should allow a user to log in with valid credentials', () => {
-    const userPayload = {
-      user: {
-        username,
-        email,
-        password
-      }
-    };
+    const { username, email, password, payload } = generateUser();
 
-    cy.request('POST', apiUrl, userPayload);
+    cy.request('POST', API_URL, payload);
 
-    cy.get(loginLinkSelector).click();
-
-    cy.get(emailInputSelector).type(email);
-    cy.get(passwordInputSelector).type(password);
-
-    cy.get(loginButtonSelector).click();
+    cy.get(SELECTORS.loginLink).click();
+    cy.get(SELECTORS.emailInput).type(email);
+    cy.get(SELECTORS.passwordInput).type(password);
+    cy.get(SELECTORS.loginButton).click();
 
     cy.contains('a', username).should('exist');
   });
